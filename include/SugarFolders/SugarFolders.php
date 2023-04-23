@@ -1535,6 +1535,8 @@ class SugarFolder
         if (empty($folders)) {
             return false;
         }
+        
+        $idValues = $this->recursiveFind( $folders, 'id' );
 
         foreach ($folders as $folder) {
             $isSelected = $folder['selected'] ?? false;
@@ -1543,12 +1545,32 @@ class SugarFolder
             }
             $id = $folder['id'] ?? '';
 
-            if ($id === $folderId) {
+            //if ($id === $folderId) {
+            if( in_array( $folderId, $idValues ) ) {
                 return true;
             }
         }
 
         return false;
+    }
+    
+    /**
+     * Returns values from a recursive multi-dimensional array matching only the specified key
+     * @param array $array
+     * @param string $keyNeedle
+     * @return array
+     */
+    protected function recursiveFind(array $array, $keyNeedle)
+    {
+        $iterator  = new RecursiveArrayIterator($array);
+        $recursive = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::SELF_FIRST);
+        $aHitList = array();
+        foreach ($recursive as $key => $value) {
+            if ($key === $keyNeedle) {
+                array_push($aHitList, $value);
+            }
+        }
+        return $aHitList;
     }
 
     /**
